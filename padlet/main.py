@@ -96,8 +96,3 @@ class padlet:
                     # Relations are already created so just reference them
                     section.board = self
 
-
-
-pad = padlet('pdltp_7d6761555fe960a0b77b20feab7bc5319e6e02ae6ea2a176ae31b81780e0f6064adc7e')
-boar = pad.board('eq2dci54eo05spze')
-asyncio.run(boar.fetch())

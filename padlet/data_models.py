@@ -5,6 +5,7 @@ import typing
 from typing import Union, Literal
 import datetime
 from datetime import datetime, timezone, timedelta
+import aiohttp
 
 
 class user_object():
@@ -28,20 +29,34 @@ class settings_object():
         self.color_scheme: str = None
 
 class post_content_object():
-    def __init__(self) -> None:
+    def __init__(self, padlet, post) -> None:
         self.subject: str = None
         self.body_html: str = None
-        self.attachment: attachment_object = attachment_object()
+        self.attachment: attachment_object = attachment_object(padlet, post)
         self.updated_at: datetime = None
 
 class attachment_object():
-    def __init__(self) -> None:
+    def __init__(self, padlet, post) -> None:
         self.url: str = None
         self.caption: str = None
+        self.post: post_object = post
+        self.padlet = padlet
+        # These need to be fetched
+        self.preview_image_url: str = None
+        self.embed_code: str = None
 
     async def fetch(self):
-        # TODO
-        pass
+        if not self.url:
+            return
+        async with aiohttp.ClientSession(headers={'X-Api-Key': self.padlet.api_key}) as connection:
+            resp = await connection.get(f'https://api.padlet.dev/v1/posts/{self.post.id}/attachmentData')
+        content = await resp.json()
+        if not resp.status == 200:
+            raise Exception(f'Non-200 status code: {content}')
+        self.preview_image_url = content['data']['attributes']['previewImageUrl']
+        self.embed_code = content['data']['attributes']['embedCode']
+        print(self)
+        return self
 
 class map_object():
     def __init__(self) -> None:
@@ -87,14 +102,14 @@ class section_object():
 
 
 class post_object():
-    def __init__(self) -> None:
+    def __init__(self, padlet) -> None:
         self.id: str = None
         self.type: str = 'post'
         self.board: board_object = None
         self.section: section_object = None
         self.author: user_object = user_object()
         self.index: int = None
-        self.content: post_content_object = post_content_object()
+        self.content: post_content_object = post_content_object(padlet, self)
         self.color: str = None
         self.status: Literal['approved', 'pending_moderation', 'scheduled']
         self.map_properties: map_object = map_object()

@@ -6,10 +6,7 @@ dependencies = [
 ]
 requires-python = ">=3.12"
 authors = [
-  {name = "Imad Younis", email = "imadyounis2004@gmail.com"},
-]
-maintainers = [
-  {name = "Imad Younis", email = "imadyounis2004@gmail.com"},
+  {name = "Hypurrnating"},
 ]
 description = "A Padlet API wrapper written in python using async/await syntax"
 readme = "README.md"

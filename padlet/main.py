@@ -18,6 +18,9 @@ class padlet:
             self.padlet = padlet
             self.id = board_id
         
+        async def create_post():
+            pass
+        
         async def fetch(self, posts: bool = True, sections: bool = True):
             _queries = [name for name, value in locals().items() if name if name in ['posts', 'sections'] and value is True] # allat just to avoid a few more lines.
             queries = "%2C".join(_queries)
@@ -45,7 +48,7 @@ class padlet:
             self.created_at = datetime.fromisoformat(content['data']['attributes']['createdAt'])
             self.updated_at = datetime.fromisoformat(content['data']['attributes']['updatedAt'])
             for post in content['data']['relationships']['posts']['data']:
-                self.posts[post['id']] = post_object()
+                self.posts[post['id']] = post_object(self.padlet)
             for section in content['data']['relationships']['sections']['data']:
                 self.sections[section['id']] = section_object()
             
@@ -79,6 +82,9 @@ class padlet:
                     # Relations are already created, so just reference them
                     post.section = self.sections[object['relationships']['section']['data']['id']]
                     post.board = self
+
+                    # Fetch and load attachments
+                    await post.content.attachment.fetch()
 
                 if object['type'] == 'section':
                     section: section_object = self.sections[object['id']]

@@ -95,4 +95,3 @@ class padlet:
                     
                     # Relations are already created so just reference them
                     section.board = self
-

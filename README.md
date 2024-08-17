@@ -21,11 +21,10 @@ user = padlet.user(api_key)
 board = user.board(board_id)
 ```
 ```py
-async def get_data():
-    # You must fetch the data from the api using:
-    await board.fetch()
-    # The board attributes, sections, and posts (including attachments) are 
-    # now loaded into the object.
+# You must fetch the data from the api using:
+await board.fetch()
+# The board attributes, sections, and posts (including attachments) are 
+# now loaded into the object.
  ```
 
  ### How to use

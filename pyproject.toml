@@ -1,10 +1,10 @@
 [project]
 name = "padlet-py"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
   "aiohttp"
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 authors = [
   {name = "Hypurrnating"},
 ]

@@ -1,11 +1,12 @@
 import asyncio
-import aiohttp
 import typing
+from typing import Dict, Literal
 from datetime import datetime, timezone, timedelta
+import aiohttp
 import data_models
-from data_models import board_object, section_object, post_object
+from data_models import board_object, section_object, post_object, map_object, canvas_object
 
-class padlet:
+class user:
     def __init__(self, api_key) -> None:
         self.api_key = api_key
         
@@ -13,12 +14,20 @@ class padlet:
         return self._board(self, board_id)
 
     class _board(board_object):
-        def __init__(self, padlet, board_id: int) -> None:
+        def __init__(self, user, board_id: int) -> None:
             super().__init__()
-            self.padlet = padlet
+            self.user = user
             self.id = board_id
         
-        async def create_post():
+        async def create(self,
+                         subject: str,
+                         body: str,
+                         color: Literal['red', 'orange', 'green', 'blue', 'purple'] = None,
+                         attachment_url: str = None,
+                         attachment_caption: str = None,
+                         map: map_object = None,
+                         canvas: canvas_object = None):
+            """ Creates a post not specific to any section """
             pass
         
         async def fetch(self, posts: bool = True, sections: bool = True):
@@ -29,6 +38,9 @@ class padlet:
             content = await resp.json()
             if not resp.status == 200:
                 raise Exception(f'Non-200 status code: {content}')
+            
+            self.posts.clear()
+            self.sections.clear()
             
             # Populate attributes & relationships
             self.title = content['data']['attributes']['title']
@@ -48,7 +60,7 @@ class padlet:
             self.created_at = datetime.fromisoformat(content['data']['attributes']['createdAt'])
             self.updated_at = datetime.fromisoformat(content['data']['attributes']['updatedAt'])
             for post in content['data']['relationships']['posts']['data']:
-                self.posts[post['id']] = post_object(self.padlet)
+                self.posts[post['id']] = post_object()
             for section in content['data']['relationships']['sections']['data']:
                 self.sections[section['id']] = section_object()
             
@@ -82,6 +94,7 @@ class padlet:
                     # Relations are already created, so just reference them
                     post.section = self.sections[object['relationships']['section']['data']['id']]
                     post.board = self
+                    self.sections[object['relationships']['section']['data']['id']][post.id] = post
 
                     # Fetch and load attachments
                     await post.content.attachment.fetch()

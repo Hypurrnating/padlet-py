@@ -74,7 +74,7 @@ async def create(section: section_object):
     # You can also construct your own post object, using just the id.
     post = post_object()
     post.id = 'post_id'
-    # Again, you its recommended that you reference another post from the board:
+    # Again, its recommended that you reference another post from the board:
     post = section.board.posts['post_id'] 
 
     await section.create(subject='Python',
